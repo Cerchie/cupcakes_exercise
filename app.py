@@ -12,6 +12,17 @@ app.config['SECRET_KEY'] = "oh-so-secret"
 connect_db(app)
 
 
+@app.route('/')
+def index_page():
+    """Renders html template that includes some JS - NOT PART OF JSON API!"""
+    cupcakes = Cupcake.query.all()
+    return render_template('index.html', cupcakes=cupcakes)
+
+# ------------------------
+# JSON api
+# -----------------------
+
+
 @app.route('/api/cupcakes')
 def list_cupcakes():
     """Returns JSON w/ all cupcakes"""
