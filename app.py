@@ -12,30 +12,38 @@ app.config['SECRET_KEY'] = "oh-so-secret"
 connect_db(app)
 
 
-@app.route("/api/cupcakes")
+@app.route('/api/cupcakes')
 def list_cupcakes():
-    """Return all cupcakes in system.
-
-    Returns JSON like:
-        {cupcakes: [{id, flavor, rating, size, image}, ...]}
-    """
-
-    cupcakes = [cupcake.to_dict() for cupcake in Cupcake.query.all()]
+    """Returns JSON w/ all cupcakes"""
+    cupcakes = [cupcake.serialize() for cupcake in Cupcake.query.all()]
     return jsonify(cupcakes=cupcakes)
 
 
-# @app.route('/api/cupcakes/<int:id>')
-# def get_cupcake(id):
-#     """Returns JSON for one cupcake in particular"""
-#     cupcake = Cupcake.query.get_or_404(id)
-#     return jsonify(cupcake=cupcake.serialize())
+@app.route('/api/cupcakes/<int:id>')
+def get_cupcake(id):
+    """Returns JSON for one cupcake in particular"""
+    cupcake = Cupcake.query.get_or_404(id)
+    return jsonify(cupcake=cupcake.serialize())
 
 
-# @app.route('/api/cupcakes', methods=["POST"])
-# def create_cupcake():
-#     """Creates a new cupcake and returns JSON of that created cupcake"""
-#     new_cupcake = Cupcake(flavor=request.json["flavor"])
-#     db.session.add(new_cupcake)
-#     db.session.commit()
-#     response_json = jsonify(cupcake=new_cupcake.serialize())
-#     return (response_json, 201)
+@app.route("/api/cupcakes", methods=["POST"])
+def create_cupcake():
+    """Add cupcake, and return data about new cupcake.
+
+    Returns JSON like:
+        {cupcake: [{id, flavor, rating, size, image}]}
+    """
+
+    data = request.json
+
+    cupcake = Cupcake(
+        flavor=data['flavor'],
+        rating=data['rating'],
+        size=data['size'],
+        image=data['image'] or None)
+
+    db.session.add(cupcake)
+    db.session.commit()
+
+    # POST requests should return HTTP status of 201 CREATED
+    return (jsonify(cupcake=cupcake.serialize()), 201)
