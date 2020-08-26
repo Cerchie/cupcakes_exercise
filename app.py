@@ -47,3 +47,22 @@ def create_cupcake():
 
     # POST requests should return HTTP status of 201 CREATED
     return (jsonify(cupcake=cupcake.serialize()), 201)
+
+
+@app.route('/api/cupcakes/<int:id>', methods=["PATCH"])
+def update_cupcake(id):
+    """Updates a particular todo and responds w/ JSON of that updated todo"""
+    cupcake = Cupcake.query.get_or_404(id)
+    cupcake.flavor = request.json.get('flavor', cupcake.flavor)
+    cupcake.size = request.json.get('size',  cupcake.serialize)
+    db.session.commit()
+    return jsonify(cupcake=cupcake.serialize())
+
+
+@app.route('/api/cupcakes/<int:id>', methods=["DELETE"])
+def delete_cupcake(id):
+    """Deletes a particular todo"""
+    cupcake = Cupcake.query.get_or_404(id)
+    db.session.delete(cupcake)
+    db.session.commit()
+    return jsonify(message="deleted")
