@@ -119,7 +119,7 @@ class CupcakeViewsTestCase(TestCase):
 def test_patch_cupcake(self):
     with app.test_client() as client:
         url = "/api/cupcakes/<int:id>"
-        resp = client.post(url, json=CUPCAKE_DATA_3)
+        resp = client.patch(url, json=CUPCAKE_DATA_3)
 
         self.assertEqual(resp.status_code, 200)
 
@@ -144,6 +144,35 @@ def test_patch_cupcake(self):
 # def test_delete_cupcake(self):
 #     with app.test_client() as client:
 #         url = "/api/cupcakes/<int:id>"
-#         resp = client.post(url, json=CUPCAKE_DATA_3)
+#         resp = client.delete(url, json=CUPCAKE_DATA_3)
 
-#         self.assertEqual(resp.status_code, )
+#         self.assertEqual(resp.status_code, 200)
+
+#         data = resp.json
+
+#         # don't know what ID we'll get, make sure it's an int & normalize
+#         self.assertIsInstance(data['cupcake']['id'], int)
+#         del data['cupcake']['id']
+
+#         self.assertEqual(data, {
+#             "cupcake": {
+#                 "flavor": "TestFlavor3",
+#                 "size": "TestSize3",
+#                 "rating": 1,
+#                 "image": "http://test.com/cupcake2.jpg"
+#             }
+#         })
+
+#         self.assertEqual(Cupcake.query.count(), 2) my first attempt followed by solution code below
+
+def test_delete_cupcake(self):
+    with app.test_client() as client:
+        url = f"/api/cupcakes/{self.cupcake.id}"
+        resp = client.delete(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+        data = resp.json
+        self.assertEqual(data, {"message": "Deleted"})
+
+        self.assertEqual(Cupcake.query.count(), 0)
